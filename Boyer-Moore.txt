@@ -1,0 +1,56 @@
+#include <iostream>
+#include <string>
+#include <vector>
+using namespace std;
+
+#define NO_OF_CHARS 256
+
+// Preprocess: build bad character table
+void badCharHeuristic(string str, int size, vector<int>& badChar) {
+    for (int i = 0; i < NO_OF_CHARS; i++)
+        badChar[i] = -1;
+
+    for (int i = 0; i < size; i++)
+        badChar[(int)str[i]] = i;
+}
+
+// Boyer-Moore search using bad character heuristic
+void boyerMooreSearch(string text, string pattern) {
+    int m = pattern.size();
+    int n = text.size();
+
+    vector<int> badChar(NO_OF_CHARS);
+    badCharHeuristic(pattern, m, badChar);
+
+    int s = 0; // shift of the pattern
+    while (s <= (n - m)) {
+        int j = m - 1;
+
+        // Match from right to left
+        while (j >= 0 && pattern[j] == text[s + j])
+            j--;
+
+        if (j < 0) {
+            cout << "Pattern found at index " << s << endl;
+
+            // Shift pattern so next character in text aligns
+            s += (s + m < n) ? m - badChar[text[s + m]] : 1;
+        } else {
+            // Shift pattern to skip mismatched character
+            s += max(1, j - badChar[text[s + j]]);
+        }
+    }
+}
+
+int main() {
+    string text = "ABAAABCDABC";
+    string pattern = "ABC";
+
+    cout << "Text: " << text << endl;
+    cout << "Pattern: " << pattern << endl;
+    cout << "Searching...\n";
+
+    boyerMooreSearch(text, pattern);
+
+    return 0;
+}

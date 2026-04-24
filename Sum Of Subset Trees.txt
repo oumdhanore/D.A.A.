@@ -1,0 +1,51 @@
+#include <iostream>
+using namespace std;
+
+#define MAX 20
+
+int set[MAX], subset[MAX];
+int n, target;
+
+// Backtracking function
+void sumOfSubsets(int s, int k, int r) {
+    // s = sum of current subset
+    // k = current index
+    // r = sum of remaining elements
+
+    subset[k] = 1; // include set[k]
+    if (s + set[k] == target) {
+        cout << "Subset found: ";
+        for (int i = 0; i <= k; i++) {
+            if (subset[i] == 1)
+                cout << set[i] << " ";
+        }
+        cout << endl;
+    } else if (s + set[k] + set[k + 1] <= target && k + 1 < n) {
+        sumOfSubsets(s + set[k], k + 1, r - set[k]);
+    }
+
+    subset[k] = 0; // exclude set[k]
+    if (s + set[k + 1] <= target && s + r - set[k] >= target && k + 1 < n) {
+        sumOfSubsets(s, k + 1, r - set[k]);
+    }
+}
+
+int main() {
+    cout << "Enter number of elements: ";
+    cin >> n;
+
+    cout << "Enter elements (sorted ascending): ";
+    int total = 0;
+    for (int i = 0; i < n; i++) {
+        cin >> set[i];
+        total += set[i];
+    }
+
+    cout << "Enter target sum: ";
+    cin >> target;
+
+    cout << "Subsets with sum " << target << ":\n";
+    sumOfSubsets(0, 0, total);
+
+    return 0;
+}
